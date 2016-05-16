@@ -21,7 +21,6 @@
 MediaPlayer 中大部分的功能使用 C++ 实现，Java 这边做的工作大部分是 JNI 的调用，这篇文章主要分析了常用的几个接口对应 C++ 实现和 Media Server。 
 
 
-
 ## 2.Media Server
 
 Media Server 整体的架构是 C/S 架构，C 和 S 之间的通讯是 IPC，具体来说是 Binder。Media Server 中大量的用到了 Binder。整个架构将播放控制、视频、音频、相机等和多媒体有关的这些包装成不同的服务，通过 IPC 解耦。下图是 Google 关于 Android 中 [Media 引擎](https://source.android.com/devices/media.html)的架构做的关系图。
@@ -586,7 +585,7 @@ status_t AwesomePlayer::prepareAsync_l() {
 }
 ```
 
-mQueue 是 [TimedEventQueue](https://android.googlesource.com/platform/frameworks/av/+/android-6.0.1_r26/media/libstagefright/TimedEventQueue.cpp)，TimedEventQueue 和 Handler 很相似，使用 pthread 和 队列来管理消息。在这里通过异步方式回调 onPrepareAsyncEvent 方法：
+mQueue 是 [TimedEventQueue](https://android.googlesource.com/platform/frameworks/av/+/android-5.1.1_r18/media/libstagefright/TimedEventQueue.cpp)，TimedEventQueue 和 Handler 很相似，使用 pthread 和 队列来管理消息。在这里通过异步方式回调 onPrepareAsyncEvent 方法：
 
 ```cpp
 void AwesomePlayer::onPrepareAsyncEvent() {
@@ -673,7 +672,7 @@ void AwesomePlayer::finishAsyncPrepare_l() {
 
 ### 3.4 start
 
-Java 代码这边的 start 方法对应的是 [StagefrightPlayer](https://android.googlesource.com/platform/frameworks/av/+/android-6.0.1_r26/media/libmediaplayerservice/StagefrightPlayer.cpp) 中的 start，其中又调用了 player 的 play 方法
+Java 代码这边的 start 方法对应的是 [StagefrightPlayer](https://android.googlesource.com/platform/frameworks/av/+/android-5.1.1_r18/media/libmediaplayerservice/StagefrightPlayer.cpp) 中的 start，其中又调用了 player 的 play 方法
 
 ```cpp
 status_t StagefrightPlayer::start() {
@@ -887,3 +886,7 @@ MediaPlayer 整体上的流程就是这些，其中相对复杂的地方集中�
 
 
 ## 5.参考
+[Media Playback](http://developer.android.com/guide/topics/media/mediaplayer.html)
+[MediaPlayer](http://developer.android.com/reference/android/media/MediaPlayer.html)
+[Media](https://source.android.com/devices/media/index.html)
+[深入理解 Android I](http://wiki.jikexueyuan.com/project/deep-android-v1/binder.html)
