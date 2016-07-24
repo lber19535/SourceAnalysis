@@ -141,6 +141,7 @@ static sp<MediaPlayer> setMediaPlayer(JNIEnv* env, jobject thiz, const sp<MediaP
 这里解释两点：
 
 **1**.由于指针的大小和 long 的大小是一样的，所以可以通过 SetLongField 和 GetLongField 来保存函数指针。
+
 **2**.由于 shared_ptr 和 weak_ptr 是 C++11 中才加入的，所以源码中实现了 sp 和 wp 作为智能指针来使用，这里可以看到代码中手动控制了引用计数。
 
 现在一个 mediaplayer 对象就创建好了，其他的 jni 中对应的方法几乎都是调用 mediaplayer 来完成的。
@@ -379,9 +380,13 @@ enum player_type {
 下面说下这几种类型是做什么的，其中的每一个都对应一个工厂来创建对应的 Player，由于 PV_PLAYER 已经被抛弃了，所以在 5.1 的源码里并没有出现它
 
 1.**PV_PLAYER**    这个类型是 Android 最初采用的 OpenCore，由于太臃肿已经被抛弃
+
 2.**SONIVOX_PLAYER**   用来处理 midi 相关
+
 3.**NU_PLAYER**    全能型，在 5.x 上处于可选
+
 4.**STAGEFRIGHT_PLAYER**    5.x 之前的主力即 awesome player ，可以胜任除 midi 外全部的工作
+
 5.**TEST_PLAYER**    测试用
 
 这些 player 都是由对应的 factory 创建的，对应的实现在 [MediaPlayerFactory.cpp](https://android.googlesource.com/platform/frameworks/av/+/android-5.1.1_r18/media/libmediaplayerservice/MediaPlayerFactory.cpp) 中，其中的代码比较简单，这里就不分析了，主要是匹配不同类型对应不同的分数，然后选取分高的 player 创建。当前的主力是 STAGEFRIGHT_PLAYER 也就是 awesome player，而 NU_PLAYER  是未来的主力，从 Android M 目前的[源码](https://android.googlesource.com/platform/frameworks/av/+/android-m-preview-2/media/libmediaplayerservice/MediaPlayerFactory.cpp)中也可以看出代码中只剩下了 NU_PLAYER 和 STAGEFRIGHT_PLAYER，其中 NU_PLAYER 负责网络和流的播放，STAGEFRIGHT_PLAYER 负责有 DRM 和文件的播放。
@@ -887,6 +892,9 @@ MediaPlayer 整体上的流程就是这些，其中相对复杂的地方集中�
 
 ## 5.参考
 [Media Playback](http://developer.android.com/guide/topics/media/mediaplayer.html)
+
 [MediaPlayer](http://developer.android.com/reference/android/media/MediaPlayer.html)
+
 [Media](https://source.android.com/devices/media/index.html)
+
 [深入理解 Android I](http://wiki.jikexueyuan.com/project/deep-android-v1/binder.html)
